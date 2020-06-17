@@ -34,9 +34,10 @@ void F77_s2chke(char *rout) {
    extern int RowMajorStrg;
    extern char *cblas_rout;
 
+   cblas_xerbla_test_init();
+
    if (link_xerbla) /* call these first to link */
    {
-      cblas_xerbla(cblas_info,cblas_rout,"");
       F77_xerbla(cblas_rout,&cblas_info);
    }
 
