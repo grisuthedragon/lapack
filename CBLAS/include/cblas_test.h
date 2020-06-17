@@ -21,6 +21,8 @@
 typedef struct { float real; float imag; } CBLAS_TEST_COMPLEX;
 typedef struct { double real; double imag; } CBLAS_TEST_ZOMPLEX;
 
+extern void cblas_xerbla_test_init();
+
 #define F77_xerbla 		F77_GLOBAL(xerbla,XERBLA)
 /*
  * Level 1 BLAS

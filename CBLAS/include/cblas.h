@@ -1,7 +1,7 @@
 #ifndef CBLAS_H
 #define CBLAS_H
 #include <stddef.h>
-
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {            /* Assume C declarations for C++ */
@@ -579,8 +579,34 @@ void cblas_zher2k(CBLAS_LAYOUT layout, CBLAS_UPLO Uplo,
                   const void *alpha, const void *A, const int lda,
                   const void *B, const int ldb, const double beta,
                   void *C, const int ldc);
+/*
+ * Error Handling
+ */
+
+/*
+ * Type definition for the user supplied error handler. The error
+ * handler gets an additional first argument, which may contain
+ * auxilliary data provided by the user. The return value decides
+ * whether the default cblas_xerbla will continue (1) or not (0).
+ * In this way the standard handler can be replaced or extended.
+ */
+typedef int (*cblas_xerbla_function_t)(void *, int, const char*, const char*, va_list);
+
+/*
+ * Set a new error handler called by cblas_xerbla. A previously set error handler
+ * is returned by the function such that it can be restored afterwards.
+ */
+cblas_xerbla_function_t cblas_xerbla_set(cblas_xerbla_function_t new_handler);
+
+/*
+ * Set the auxilliary data for the error handler. The previously set value is
+ * returned by the function such that it can be restored afterwards.
+ */
+void * cblas_xerbla_set_aux(void *aux);
+
 
 void cblas_xerbla(int p, const char *rout, const char *form, ...);
+
 
 #ifdef __cplusplus
 }

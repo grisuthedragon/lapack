@@ -39,9 +39,10 @@ void  F77_c3chke(char *  rout) {
    cblas_ok = TRUE ;
    cblas_lerr = PASSED ;
 
+   cblas_xerbla_test_init();
+
    if (link_xerbla) /* call these first to link */
    {
-      cblas_xerbla(cblas_info,cblas_rout,"");
       F77_xerbla(cblas_rout,&cblas_info);
    }
 

@@ -1,3 +1,8 @@
+/*
+ * CBLAS Error handling.
+ * Rewrite by Martin Koehler <koehlerm(AT)mpi-magdeburg.mpg.de>
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,13 +10,49 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 
+// typedef int (*cblas_xerbla_function_t)(void *, int, const char*, const char*, va_list);
+// cblas_xerbla_function_t cblas_xerbla_set(cblas_xerbla_function_t new_handler);
+// void * cblas_xerbla_set_aux(void *aux);
+
+/* Initialize the default  */
+static void *errhandler_aux = NULL;
+static cblas_xerbla_function_t errorhandler = NULL;
+
+cblas_xerbla_function_t cblas_xerbla_set(cblas_xerbla_function_t new_handler)
+{
+    cblas_xerbla_function_t old_handler = errorhandler;
+    errorhandler = new_handler;
+    return old_handler;
+}
+
+void *cblas_xerbla_set_aux(void *aux)
+{
+    void *oldaux = errhandler_aux;
+    errhandler_aux = aux;
+    return oldaux;
+}
+
+
 void cblas_xerbla(int info, const char *rout, const char *form, ...)
 {
    extern int RowMajorStrg;
    char empty[1] = "";
    va_list argptr;
+   int ret_handler = 1;
 
    va_start(argptr, form);
+
+   if ( errorhandler != NULL )
+   {
+        va_list argptr2;
+        va_copy(argptr, argptr2);
+        ret_handler = errorhandler(errhandler_aux, info, rout, form, argptr2);
+        va_end(argptr2);
+   }
+
+
+   if ( ret_handler == 0 )
+       return;
 
    if (RowMajorStrg)
    {

@@ -5,7 +5,15 @@
 #include "cblas.h"
 #include "cblas_test.h"
 
-void cblas_xerbla(int info, const char *rout, const char *form, ...)
+int cblas_xerbla_handler(void * aux, int info, const char *rout, const char *form, va_list ap);
+
+void cblas_xerbla_test_init()
+{
+    cblas_xerbla_set(cblas_xerbla_handler);
+    cblas_xerbla_set_aux(NULL);
+}
+
+int cblas_xerbla_handler(void * aux, int info, const char *rout, const char *form, va_list ap)
 {
    extern int cblas_lerr, cblas_info, cblas_ok;
    extern int link_xerbla;
@@ -17,7 +25,6 @@ void cblas_xerbla(int info, const char *rout, const char *form, ...)
     * This is done to fool the linker into loading these subroutines first
     * instead of ones in the CBLAS or the legacy BLAS library.
     */
-   if (link_xerbla) return;
 
    if (cblas_rout != NULL && strcmp(cblas_rout, rout) != 0){
       printf("***** XERBLA WAS CALLED WITH SRNAME = <%s> INSTEAD OF <%s> *******\n", rout, cblas_rout);
@@ -82,6 +89,8 @@ void cblas_xerbla(int info, const char *rout, const char *form, ...)
       cblas_lerr = PASSED;
       cblas_ok = FALSE;
    } else cblas_lerr = FAILED;
+
+   return 0;
 }
 
 #ifdef F77_Char
