@@ -148,6 +148,16 @@ if(APPLE)
         "Disable shared libraries or enable flat namespace for symbol resolution via -DUSE_FLAT_NAMESPACE=ON.")
     endif()
   endif()
+
+  if (CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64"
+      AND CMAKE_Fortran_COMPILER_ID STREQUAL "GNU"
+      AND CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL "14.0.0"
+      AND CMAKE_Fortran_COMPILER_VERSION VERSION_LESS_EQUAL "16.0.0")
+      add_compile_options("$<$<COMPILE_LANGUAGE:Fortran>:-fno-tree-loop-vectorize>")
+      add_compile_options("$<$<COMPILE_LANGUAGE:Fortran>:-fno-expensive-optimizations>")
+      message(WARNING "On MacOS/Apple Silicon GCC 14 and 15 too much optimizations produces incorrect machine code.")
+  endif()
+
 endif()
 
 # --------------------------------------------------
